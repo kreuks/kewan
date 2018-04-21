@@ -1,0 +1,10 @@
+data/*
+.idea
+*.pyc
+*.DS_Store
+.vagrant/
+*~
+.ipynb_checkpoints/
+*.pyc
+*.out
+*.log
