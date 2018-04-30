@@ -1,0 +1,68 @@
+{
+  "preprocessor": {
+    "animal_index": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 88],
+    "num_classes": 90
+  },
+    "logger": {
+    "name": "kewan",
+    "version": 1,
+    "disable_existing_loggers": false,
+    "handlers": {
+      "debug_stdout_handler": {
+        "class": "logging.StreamHandler",
+        "level": "DEBUG",
+        "stream": "ext://sys.stdout",
+        "formatter": "verbose"
+      },
+      "warning_stdout_handler": {
+        "class": "logging.StreamHandler",
+        "level": "WARNING",
+        "stream": "ext://sys.stdout",
+        "formatter": "verbose"
+      },
+      "info_stdout_handler": {
+        "class": "logging.StreamHandler",
+        "level": "INFO",
+        "stream": "ext://sys.stdout",
+        "formatter": "verbose"
+      },
+      "info_file_handler": {
+        "class": "logging.handlers.RotatingFileHandler",
+        "level": "INFO",
+        "formatter": "verbose",
+        "filename": "logs/kewan_info.log",
+        "maxBytes": 1048576,
+        "backupCount": 512,
+        "encoding": "utf8"
+      }
+    },
+    "formatters": {
+      "verbose": {
+        "format": "%(name)s - %(asctime)s - %(message)s"
+      }
+    },
+    "loggers": {
+      "kewan": {
+        "level": "DEBUG",
+        "handlers": [
+          "debug_stdout_handler",
+          "info_file_handler"
+        ],
+        "propagate": false
+      },
+      "tensorflow": {
+        "level": "INFO",
+        "handlers": [
+          "info_stdout_handler",
+          "info_file_handler"
+        ]
+      },
+      "root": {
+        "level": "WARNING",
+        "handlers": [
+          "warning_stdout_handler"
+        ]
+      }
+    }
+  }
+}
