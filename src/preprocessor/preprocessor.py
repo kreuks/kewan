@@ -4,10 +4,11 @@ import os
 
 import numpy as np
 import tensorflow as tf
-from keras.preprocessing import image as keras_image
 from PIL import Image
+from keras.preprocessing import image as keras_image
 
-from src.utils import category_index, proper_index
+from src.config import CONFS
+from src.constant import PreprocessorKeys, PREPROCESSOR
 
 
 class Preprocessor(object):
@@ -18,7 +19,8 @@ class Preprocessor(object):
     def sort_by_score(boxes, classes, scores):
         index = np.argsort(scores[::-1])[:5]
         for score, class_ in zip(scores[index], classes[index]):
-            if class_ not in proper_index:
+            if (score < CONFS[PREPROCESSOR][PreprocessorKeys.MINIMUM_SCORE]
+                and class_ not in CONFS[PREPROCESSOR][PreprocessorKeys.ANIMAL_INDEX]):
                 index = index[:-1]
         return boxes[index], classes[index], scores[index]
 
@@ -43,6 +45,10 @@ class Preprocessor(object):
 
     @staticmethod
     def save_image(pil_image, output_path):
+        """
+        :param pil_image: Pillow Image
+        :param output_path: string
+        """
         pil_image.save(output_path, format='JPEG')
 
     def detect_objects(self, image_np):
@@ -65,6 +71,12 @@ class TensorflowPreprocessor(Preprocessor):
             self.sess = tf.Session(graph=self.detection_graph)
 
     def detect_objects(self, image_np):
+        """
+        Detect object in numpy image.
+
+        :param image_np: numpy array
+        :return: tuple
+        """
         image_np_expanded = np.expand_dims(image_np, axis=0)
         image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
         boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
@@ -75,12 +87,15 @@ class TensorflowPreprocessor(Preprocessor):
 
         (boxes, scores, classes, num_detections) = self.sess.run(
             [boxes, scores, classes, num_detections],
-            feed_dict={image_tensor: image_np_expanded}
-        )
+            feed_dict={image_tensor: image_np_expanded})
 
         return self.sort_by_score(np.squeeze(boxes), np.squeeze(classes).astype(np.int32), np.squeeze(scores))
 
-    def run(self, image_path, output_image_path):
+    def run(self, image_path: str, output_image_path: str):
+        """
+        Run tensorflow preprocessor and crop image.
+
+        """
         pil_image = Image.open(image_path)
         image_np = keras_image.img_to_array(pil_image)
         annotations = self.detect_objects(image_np)
@@ -109,20 +124,20 @@ if __name__ == '__main__':
         )
 
         parser.add_argument(
-            '-m', '--model=path',
+            '-m', '--model-path',
             type=str,
             help='Path to model path.'
         )
 
         input_data_dir = parser.parse_args().input_data_dir
         output_data_dir = parser.parse_args().train_data_dir
-        model_path = parser.parse_args().eval_data_dir
+        model_path = parser.parse_args().model_path
 
         files = glob.glob(os.path.join(input_data_dir, '*'))
-        files_crop =
+        files_crop = [os.path.join(output_data_dir, os.path.basename(file)) for file in files]
 
-files = glob.glob('data/train_img/*')
-files_crop = [file.replace('train_img', 'train_img_crop') for file in files]
+        preprocessor = TensorflowPreprocessor(model_path)
+        for file, file_crop in zip(files, files_crop):
+            preprocessor.run(file, file_crop)
 
-for file, file_crop in zip(files, files_crop):
-    predict(file, file_crop)
+    main()
