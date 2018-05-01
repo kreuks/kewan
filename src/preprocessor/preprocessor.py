@@ -99,9 +99,9 @@ class TensorflowPreprocessor(Preprocessor):
         pil_image = Image.open(image_path)
         image_np = keras_image.img_to_array(pil_image)
         annotations = self.detect_objects(image_np)
-        annotation = annotations[0][0]
-        cropped_pil_image = self.crop_object(pil_image, annotation)
-        if cropped_pil_image:
+        if annotations:
+            annotation = annotations[0][0]
+            cropped_pil_image = self.crop_object(pil_image, annotation)
             self.save_image(cropped_pil_image, output_image_path)
 
 
