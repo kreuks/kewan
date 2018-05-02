@@ -4,7 +4,16 @@
     "num_classes": 90,
     "minimum_score": 0.1
   },
-    "logger": {
+  "trainer": {
+    "resize": [244, 244],
+    "num_channel": 3,
+    "rescale": 255,
+    "batch_size": 64,
+    "class_mode": "categorical",
+    "num_epoch": 200,
+    "model_name": "InceptionV3"
+  },
+  "logger": {
     "name": "kewan",
     "version": 1,
     "disable_existing_loggers": false,
