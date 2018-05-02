@@ -7,7 +7,7 @@ import tensorflow as tf
 from PIL import Image
 from keras.preprocessing import image as keras_image
 
-from src.config import CONFS
+from src.config import CONFS, LOGGER
 from src.constant import PreprocessorKeys, PREPROCESSOR
 
 
@@ -138,6 +138,7 @@ if __name__ == '__main__':
 
         preprocessor = TensorflowPreprocessor(model_path)
         for file, file_crop in zip(files, files_crop):
+            LOGGER.info('running file: {}'.format(file))
             preprocessor.run(file, file_crop)
 
     main()
