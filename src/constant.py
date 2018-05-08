@@ -12,3 +12,7 @@ class ModelerKeys():
     INCLUDE_TOP = 'include_top'
     POOLING = 'pooling'
     CLASSES = 'classes'
+    RESIZE = 'resize'
+    BATCH_SIZE = 'batch_size'
+    NUM_EPOCH = 'num_epoch'
+    MODEL_NAME = 'model_name'

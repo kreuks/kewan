@@ -4,7 +4,7 @@
     "num_classes": 90,
     "minimum_score": 0.1
   },
-  "trainer": {
+  "modeler": {
     "resize": [244, 244],
     "num_channel": 3,
     "rescale": 255,

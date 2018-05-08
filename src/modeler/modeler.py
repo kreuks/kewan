@@ -21,9 +21,8 @@ class Modeler(object):
 
 
 class InceptionV3Modeler(Modeler):
-    def __init__(self, params, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.param = params
 
     def get_model(self,
                   input_shape: list,
