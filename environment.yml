@@ -6,6 +6,6 @@ dependencies:
     - numpy==1.14.0
     - pandas==0.22.0
     - scipy
-    - tensorflow==1.8.0
+    - tensorflow-gpu==1.8.0
     - Pillow==5.1.0
     - Keras==2.1.6
