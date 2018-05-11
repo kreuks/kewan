@@ -18,29 +18,39 @@ def train(label_data_path, image_directory):
                                                          zoom_range=0.2,
                                                          horizontal_flip=True,
                                                          vertical_flip=True,
-                                                         rescale=1/255,
-                                                         validation_split=0.0)
-    data_generator = kewan_image_data_generator.flow_from_label(label_data_path,
-                                                                image_directory,
-                                                                target_size=(224, 224),
-                                                                batch_size=100)
+                                                         rescale=1 / 255,
+                                                         validation_split=0.1)
+    train_data_generator = kewan_image_data_generator.flow_from_label(label_data_path,
+                                                                      image_directory,
+                                                                      target_size=(224, 224),
+                                                                      batch_size=100,
+                                                                      subset='training')
+
+    validation_data_generator = kewan_image_data_generator.flow_from_label(label_data_path,
+                                                                           image_directory,
+                                                                           target_size=(224, 224),
+                                                                           batch_size=100,
+                                                                           subset='validation')
 
     inception_v3_model = InceptionV3Modeler().get_model(input_shape=[224, 224, 3], classes=84)
 
     model_checkpoint = ModelCheckpoint('data/model/model_checkpoint.hdf5',
-                                                 monitor='val_loss',
-                                                 verbose=0,
-                                                 save_best_only=True,
-                                                 save_weights_only=False,
-                                                 mode='auto',
-                                                 period=1)
+                                       monitor='val_loss',
+                                       verbose=0,
+                                       save_best_only=True,
+                                       save_weights_only=False,
+                                       mode='auto',
+                                       period=1)
 
     csv_logger = CSVLogger('logs/keras_log.csv', append=True, separator=',')
     tensorboard = TensorBoard(log_dir='data/tensorboard/', write_graph=True, write_images=True)
 
-    inception_v3_model.fit_generator(data_generator,
+    inception_v3_model.fit_generator(train_data_generator,
                                      steps_per_epoch=64,
                                      epochs=64,
+                                     validation_data=validation_data_generator,
+                                     validation_steps=1,
+                                     use_multiprocessing=True,
                                      callbacks=[model_checkpoint, csv_logger, tensorboard])
 
     inception_v3_model.save('data/model/model.h5')

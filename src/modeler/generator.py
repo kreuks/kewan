@@ -8,6 +8,22 @@ from tensorflow.python.keras.preprocessing import image
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator, Iterator
 
 
+def _get_train_or_validation_samples(split, num_files):
+    """
+    Get train or validation samples.
+
+    :param split: tuple
+        Tuple of fraction.
+    :param num_files: int
+    :return: int
+    """
+    if split:
+        start, stop = int(split[0] * num_files), int(split[1] * num_files)
+    else:
+        start, stop = 0, num_files
+    return stop - start
+
+
 class KewanImageDataGenerator(ImageDataGenerator):
     """Generate minibatches of image data with real-time data augmentation.
 
@@ -185,12 +201,26 @@ class ImageIterator(Iterator):
             else:
                 self.image_shape = (1,) + self.target_size
 
-        self.data = pd.read_csv(label_data_path, converters={1: ast.literal_eval}).values
-        self.samples = len(self.data)
+        if subset:
+            validation_split = self.image_data_generator.validation_split
+            if subset == 'validation':
+                split = (0, validation_split)
+            elif subset == 'training':
+                split = (validation_split, 1)
+            else:
+                raise ValueError('Invalid subset name: ', subset,
+                                 '; expected "training" or "validation')
+        else:
+            split = None
+        self.subset = subset
 
-        for index in range(self.samples):
+        self.data = pd.read_csv(label_data_path, converters={1: ast.literal_eval}).values
+        num_files = len(self.data)
+
+        for index in range(num_files):
             self.data[index, 1] = np.array(self.data[index, 1])
 
+        self.samples = _get_train_or_validation_samples(split, num_files)
         self.interpolation = interpolation
         self.subset = subset
 
@@ -213,14 +243,15 @@ class ImageIterator(Iterator):
         return np.array(temp)
 
     def _get_batches_of_transformed_samples(self, index_array):
-        """Gets a batch of transformed samples.
-
-        Arguments:
-            index_array: array of sample indices to include in batch.
-
-        Returns:
-            A batch of transformed samples.
         """
+        Gets a batch of transformed samples.
+
+        :param index_array: numpy array
+            array of sample indices to include in batch.
+        :return: tuple
+            Tuple batch of transformed example.
+        """
+
         batch_x = np.zeros((len(index_array),) + self.image_shape, dtype=K.floatx())
         grayscale = self.color_mode == 'grayscale'
         filenames = self.data[:, 0]
