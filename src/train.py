@@ -1,10 +1,13 @@
 import os
+from multiprocessing import cpu_count
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, TensorBoard
 from tensorflow.python.lib.io import file_io
 
 from src.modeler.generator import KewanImageDataGenerator
 from src.modeler.modeler import InceptionV3Modeler
+
+CPU_COUNT = cpu_count()
 
 
 def train(label_data_path, image_directory):
@@ -46,10 +49,11 @@ def train(label_data_path, image_directory):
     tensorboard = TensorBoard(log_dir='data/tensorboard/', write_graph=True, write_images=True)
 
     inception_v3_model.fit_generator(train_data_generator,
-                                     steps_per_epoch=64,
-                                     epochs=64,
+                                     steps_per_epoch=126,
+                                     epochs=200,
                                      validation_data=validation_data_generator,
                                      validation_steps=1,
+                                     workers=CPU_COUNT,
                                      use_multiprocessing=True,
                                      callbacks=[model_checkpoint, csv_logger, tensorboard])
 
