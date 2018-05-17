@@ -35,7 +35,7 @@ def train(label_data_path, image_directory):
                                                                            batch_size=100,
                                                                            subset='validation')
 
-    inception_v3_model = InceptionV3Modeler().get_model(input_shape=[224, 224, 3], classes=84)
+    inception_v3_model = InceptionV3Modeler().get_model(input_shape=[224, 224, 3], classes=85)
 
     model_checkpoint = ModelCheckpoint('data/model/model_checkpoint.hdf5',
                                        monitor='val_loss',
