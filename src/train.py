@@ -20,7 +20,7 @@ class Trainer(object):
         for directory in [model_dir, logs_dir, tensorboard_dir]:
             os.makedirs(directory, exist_ok=True)
 
-    def create_train_validation_set(self):
+    def create_train_validation_set(self, batch_size):
         kewan_image_data_generator = KewanImageDataGenerator(rotation_range=0.5,
                                                              width_shift_range=0.1,
                                                              height_shift_range=0.1,
@@ -33,13 +33,13 @@ class Trainer(object):
         self.train_data_generator = kewan_image_data_generator.flow_from_label(self.label_data_path,
                                                                                self.image_directory,
                                                                                target_size=self.target_size,
-                                                                               batch_size=100,
+                                                                               batch_size=batch_size,
                                                                                subset='training')
 
         self.validation_data_generator = kewan_image_data_generator.flow_from_label(self.label_data_path,
                                                                                     self.image_directory,
                                                                                     target_size=self.target_size,
-                                                                                    batch_size=100,
+                                                                                    batch_size=batch_size,
                                                                                     subset='validation')
 
     @staticmethod
@@ -74,7 +74,7 @@ class InceptionV3Trainer(Trainer):
         callbacks = self.get_callback(model_checkpoint_file='data/model/inception_v3_model_checkpoint.hdf5',
                                       log_file='logs/inception_v3_keras_log.csv',
                                       tensorboard_dir='data/inception_v3_tensorboard/')
-        self.create_train_validation_set()
+        self.create_train_validation_set(100)
         self.create_model()
         self.model.fit_generator(self.train_data_generator,
                                  steps_per_epoch=126,
@@ -99,7 +99,7 @@ class InceptionV4Trainer(Trainer):
         callbacks = self.get_callback(model_checkpoint_file='data/model/inception_v4_model_checkpoint.hdf5',
                                       log_file='logs/inception_v4_keras_log.csv',
                                       tensorboard_dir='data/inception_v4_tensorboard/')
-        self.create_train_validation_set()
+        self.create_train_validation_set(60)
         self.create_model()
         self.model.fit_generator(self.train_data_generator,
                                  steps_per_epoch=126,
