@@ -99,7 +99,7 @@ class InceptionV4Trainer(Trainer):
         callbacks = self.get_callback(model_checkpoint_file='data/model/inception_v4_model_checkpoint.hdf5',
                                       log_file='logs/inception_v4_keras_log.csv',
                                       tensorboard_dir='data/inception_v4_tensorboard/')
-        self.create_train_validation_set(60)
+        self.create_train_validation_set(56)
         self.create_model()
         self.model.fit_generator(self.train_data_generator,
                                  steps_per_epoch=126,
