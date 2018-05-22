@@ -103,7 +103,7 @@ class InceptionV4Trainer(Trainer):
         self.create_train_validation_set(40)
         self.create_model()
         self.model.fit_generator(self.train_data_generator,
-                                 steps_per_epoch=70,
+                                 steps_per_epoch=320,
                                  epochs=200,
                                  validation_data=self.validation_data_generator,
                                  validation_steps=1,
