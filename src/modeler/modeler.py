@@ -1,6 +1,6 @@
 from keras import Input
 from keras import layers
-from keras.layers import Activation, Dense, merge, Dropout, Flatten
+from keras.layers import Activation, Dense, Dropout, Flatten
 from keras.layers import (Conv2D, MaxPooling2D, GlobalAveragePooling2D, GlobalMaxPooling2D, BatchNormalization,
                           AveragePooling2D)
 from keras.models import Model as ModelKeras
@@ -233,8 +233,8 @@ class InceptionV4Modeler(Modeler):
         x = Activation('relu', name=name)(x)
         return x
 
-    def __inception_stem(self, input):
-        x = self._conv2d_bn(input, 32, 3, 3, padding='valid', strides=(2, 2))
+    def __inception_stem(self, input_):
+        x = self._conv2d_bn(input_, 32, 3, 3, padding='valid', strides=(2, 2))
         x = self._conv2d_bn(x, 32, 3, 3, padding='valid')
         x = self._conv2d_bn(x, 64, 3, 3)
 
@@ -259,84 +259,84 @@ class InceptionV4Modeler(Modeler):
         x = layers.concatenate([x1, x2], axis=-1)
         return x
 
-    def __inception_A(self, input):
-        a1 = self._conv2d_bn(input, 96, 1, 1)
+    def __inception_A(self, input_):
+        a1 = self._conv2d_bn(input_, 96, 1, 1)
 
-        a2 = self._conv2d_bn(input, 64, 1, 1)
+        a2 = self._conv2d_bn(input_, 64, 1, 1)
         a2 = self._conv2d_bn(a2, 96, 3, 3)
 
-        a3 = self._conv2d_bn(input, 64, 1, 1)
+        a3 = self._conv2d_bn(input_, 64, 1, 1)
         a3 = self._conv2d_bn(a3, 96, 3, 3)
         a3 = self._conv2d_bn(a3, 96, 3, 3)
 
-        a4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input)
+        a4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input_)
         a4 = self._conv2d_bn(a4, 96, 1, 1)
 
         m = layers.concatenate([a1, a2, a3, a4], axis=-1)
         return m
 
-    def __inception_B(self, input):
-        b1 = self._conv2d_bn(input, 384, 1, 1)
+    def __inception_B(self, input_):
+        b1 = self._conv2d_bn(input_, 384, 1, 1)
 
-        b2 = self._conv2d_bn(input, 192, 1, 1)
+        b2 = self._conv2d_bn(input_, 192, 1, 1)
         b2 = self._conv2d_bn(b2, 224, 1, 7)
         b2 = self._conv2d_bn(b2, 256, 7, 1)
 
-        b3 = self._conv2d_bn(input, 192, 1, 1)
+        b3 = self._conv2d_bn(input_, 192, 1, 1)
         b3 = self._conv2d_bn(b3, 192, 7, 1)
         b3 = self._conv2d_bn(b3, 224, 1, 7)
         b3 = self._conv2d_bn(b3, 224, 7, 1)
         b3 = self._conv2d_bn(b3, 256, 1, 7)
 
-        b4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input)
+        b4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input_)
         b4 = self._conv2d_bn(b4, 128, 1, 1)
 
         m = layers.concatenate([b1, b2, b3, b4], axis=-1)
         return m
 
-    def __inception_C(self, input):
-        c1 = self._conv2d_bn(input, 256, 1, 1)
+    def __inception_C(self, input_):
+        c1 = self._conv2d_bn(input_, 256, 1, 1)
 
-        c2 = self._conv2d_bn(input, 384, 1, 1)
+        c2 = self._conv2d_bn(input_, 384, 1, 1)
         c2_1 = self._conv2d_bn(c2, 256, 1, 3)
         c2_2 = self._conv2d_bn(c2, 256, 3, 1)
         c2 = layers.concatenate([c2_1, c2_2], axis=-1)
 
-        c3 = self._conv2d_bn(input, 384, 1, 1)
+        c3 = self._conv2d_bn(input_, 384, 1, 1)
         c3 = self._conv2d_bn(c3, 448, 3, 1)
         c3 = self._conv2d_bn(c3, 512, 1, 3)
         c3_1 = self._conv2d_bn(c3, 256, 1, 3)
         c3_2 = self._conv2d_bn(c3, 256, 3, 1)
         c3 = layers.concatenate([c3_1, c3_2], axis=-1)
 
-        c4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input)
+        c4 = AveragePooling2D((3, 3), strides=(1, 1), padding='same')(input_)
         c4 = self._conv2d_bn(c4, 256, 1, 1)
 
         m = layers.concatenate([c1, c2, c3, c4], axis=-1)
         return m
 
-    def __reduction_A(self, input):
-        r1 = self._conv2d_bn(input, 384, 3, 3, strides=(2, 2), padding='valid')
+    def __reduction_A(self, input_):
+        r1 = self._conv2d_bn(input_, 384, 3, 3, strides=(2, 2), padding='valid')
 
-        r2 = self._conv2d_bn(input, 192, 1, 1)
+        r2 = self._conv2d_bn(input_, 192, 1, 1)
         r2 = self._conv2d_bn(r2, 224, 3, 3)
         r2 = self._conv2d_bn(r2, 256, 3, 3, strides=(2, 2), padding='valid')
 
-        r3 = MaxPooling2D((3, 3), strides=(2, 2), padding='valid')(input)
+        r3 = MaxPooling2D((3, 3), strides=(2, 2), padding='valid')(input_)
 
         m = layers.concatenate([r1, r2, r3], axis=-1)
         return m
 
-    def __reduction_B(self, input):
-        r1 = self._conv2d_bn(input, 192, 1, 1)
+    def __reduction_B(self, input_):
+        r1 = self._conv2d_bn(input_, 192, 1, 1)
         r1 = self._conv2d_bn(r1, 192, 3, 3, strides=(2, 2), padding='valid')
 
-        r2 = self._conv2d_bn(input, 256, 1, 1)
+        r2 = self._conv2d_bn(input_, 256, 1, 1)
         r2 = self._conv2d_bn(r2, 256, 1, 7)
         r2 = self._conv2d_bn(r2, 320, 7, 1)
         r2 = self._conv2d_bn(r2, 320, 3, 3, strides=(2, 2), padding='valid')
 
-        r3 = MaxPooling2D((3, 3), strides=(2, 2), padding='valid')(input)
+        r3 = MaxPooling2D((3, 3), strides=(2, 2), padding='valid')(input_)
 
         m = layers.concatenate([r1, r2, r3], axis=-1)
         return m
@@ -365,7 +365,7 @@ class InceptionV4Modeler(Modeler):
         if pooling == 'avg':
             x = AveragePooling2D((8, 8))(x)
         elif pooling == 'max':
-            x = MaxPooling2D((8, 8 ))(x)
+            x = MaxPooling2D((8, 8))(x)
 
         x = Dropout(0.8)(x)
         x = Flatten()(x)
@@ -377,6 +377,3 @@ class InceptionV4Modeler(Modeler):
                       optimizer='rmsprop',
                       metrics=['accuracy'])
         return model
-
-
-
